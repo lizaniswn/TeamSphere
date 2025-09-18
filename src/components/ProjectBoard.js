@@ -1,33 +1,46 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import TaskColumn from './TaskColumn';
+import React, { useEffect, useState } from 'react';
 import InviteMember from './InviteMember';
 
 const ProjectBoard = ({ theme }) => {
-  const tasks = useSelector(state => state.tasks.tasks);
-  const dispatch = useDispatch();
+  const [projects, setProjects] = useState([]);
 
-  const onDragEnd = result => {
-    const { source, destination } = result;
-    if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
-
-    dispatch(moveTask({
-      from: source.droppableId,
-      to: destination.droppableId,
-      sourceIndex: source.index,
-      destinationIndex: destination.index
-    }));
+  const reloadProjects = () => {
+    fetch('http://localhost:5001/api/projects')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setProjects(data.data);
+        }
+      });
   };
+
+  useEffect(() => {
+    reloadProjects();
+  }, []);
 
   return (
     <div>
-      <h2>Project </h2>
+            <h2>Projects</h2>
       <InviteMember />
-     <div style={{ display: 'flex', gap: '20px' }}>
-  {Object.entries(tasks).map(([status, taskList]) => (
-    <TaskColumn key={status} status={status} tasks={taskList} theme={theme} />
-  ))}
-</div>
+      <div>
+        {projects.length === 0 ? (
+          <p>No projects found.</p>
+        ) : (
+          <ul>
+            {projects.map(project => (
+              <li key={project._id}>
+                <strong>{project.name}</strong> (Owner: {project.owner})<br />
+                Members: {project.members && project.members.length > 0
+                  ? project.members.map(m => m.name).join(', ')
+                  : 'None'}<br />
+                Tasks: {project.tasks && project.tasks.length > 0
+                  ? project.tasks.map(t => t.title).join(', ')
+                  : 'None'}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

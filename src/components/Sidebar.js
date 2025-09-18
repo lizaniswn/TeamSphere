@@ -1,8 +1,12 @@
-import React from 'react';
-import ThemeToggle from './ThemeToggle';
-import './sidebar.css'; // Optional: for styling
 
-const Sidebar = ({ theme }) => {
+import React, { useState } from 'react';
+import ThemeToggle from './ThemeToggle';
+import './sidebar.css';
+import CreateProjectModal from './CreateProjectModal';
+
+const Sidebar = ({ theme, onProjectCreated }) => {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div style={{
       width: '220px',
@@ -14,10 +18,9 @@ const Sidebar = ({ theme }) => {
       justifyContent: 'space-between'
     }}>
       <div>
-        <h2 style={{ marginBottom: '30px' }}>TEAMFLOW</h2>
+        <h2 style={{ marginBottom: '30px' }}>TEAMSPHERE</h2>
         <nav>
-          <div style={{ marginBottom: '15px', cursor: 'pointer' }}>Dashboard</div>
-          <div style={{ marginBottom: '15px', cursor: 'pointer' }}>Create Project</div>
+          <div style={{ marginBottom: '15px', cursor: 'pointer' }} onClick={() => setShowModal(true)}>Create Project</div>
         </nav>
         <ThemeToggle />
       </div>
@@ -31,6 +34,7 @@ const Sidebar = ({ theme }) => {
       }}>
         LOGOUT
       </button>
+      <CreateProjectModal show={showModal} onClose={() => setShowModal(false)} onProjectCreated={onProjectCreated} />
     </div>
   );
 };
